@@ -34,10 +34,13 @@ Webcam.set({
 // Some very elementary AI parameters.
 var seen_face = 0;
 var seen_noface = 0;
+var feel_despair = false;
+
 
 // Start capturing every 5 seconds when webcam is live.
+var snap_interval;
 Webcam.on( 'live', function() {
-    // window.setInterval(take_snapshot, 5000);
+    snap_interval = setInterval(take_snapshot, 5000);
 } );
 
 
@@ -97,12 +100,17 @@ function take_snapshot() {
 }
 
 
+function end_snapshot() {
+    Webcam.reset();
+    clearInterval(snap_interval); 
+}
+
 // Let's see what we've got from Microsoft...
 function analyze_face(data) {
 
     // If there are faces detected...
     if (data.length > 0) {
-        $('#face_info').append('Wow! Hello there!');
+        $('#face_info').append('Wow! Hello there! ' + seen_face + "/" + seen_noface);
         console.log(data);
         $('#face_info').append(data[0].faceAttributes.age);
 
@@ -125,15 +133,31 @@ function analyze_face(data) {
 
 
         seen_face++;
+        if (seen_noface > 0) { seen_noface--; }
+        feel_despair = false;
 
-        // Is this the same person as 5 seconds ago?
-
-        // Is the same person 5 seconds ago still here?
     } else {
     
-    // If there are no faces detected...
-        $('#face_info').html("I can't see anyone. So lonely here. :(");
+        // If there are no faces detected...
+        if (!feel_despair) {
+            $('#face_info').html("I can't see anyone. So lonely here. :( " + seen_face + "/" + seen_noface);
+        };
 
         seen_noface++;
+        if (seen_face > 0) { seen_face--; }
+
+        // If there had been no faces for the past 12 checks (i.e. 5 * 10 = 1 minute),
+        // initiate DESPAIR.
+        if ((seen_noface > 12) && (seen_face < seen_noface) && !(feel_despair)) {
+            $('#face_info').html("I'm really sad!!! :(");
+            feel_despair = true;
+            seen_noface = 0;
+
+            // Now go write your love letters.
+        }
+
+
     }
 }
+
+

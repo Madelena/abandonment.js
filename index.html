@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Abandonment.js</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="lib/ms-face-api.js"></script>
+    <script src="lib/webcam.js"></script>
+
+    <style>
+        #face_info {
+            font: bold 64px Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="my_camera" style="width:640px; height:360px;"></div>
+    <div id="my_result"></div>
+
+    <canvas id="myCanvas" width="640" height="640"></canvas>
+    <div id="face_info"></div>
+
+    <div id="camera_controls">
+        <a href="javascript:void(take_snapshot())">Take Snapshot</a>
+        <a href="javascript:void(end_snapshot())">Stop webcam</a>
+        <a href="javascript:void(Webcam.attach( '#my_camera' ))">Start webcam</a>
+    </div>
+
+    <script src="abandonment.js"></script>
+
+</body>
+
+</html>
+

@@ -37,6 +37,21 @@ var seen_noface = 0;
 var feel_despair = false;
 
 
+// Some computer-affirming quotes.
+var life_quote = [
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    ''
+    ];
+
+
 // Start capturing every 5 seconds when webcam is live.
 var snap_interval;
 Webcam.on( 'live', function() {
@@ -46,6 +61,7 @@ Webcam.on( 'live', function() {
 
 
 // Take a snapshot from live webcam.
+// TODO: Rewrite as callback enabled function.
 function take_snapshot() {
     Webcam.snap( function(data_uri) {
 
@@ -79,10 +95,12 @@ function take_snapshot() {
 }
 
 
+// Stop webcam from capturing snapshots.
 function end_snapshot() {
     Webcam.reset();
     clearInterval(snap_interval); 
 }
+
 
 // Let's see what we've got from Microsoft...
 function analyze_face(data) {
@@ -108,7 +126,7 @@ function analyze_face(data) {
         if ( rect.left + rect.width + pad > webcam_width ) { crop.width = webcam_width - crop.left; } else { crop.width = rect.width + pad * 2};
         if ( rect.top + rect.height + pad > webcam_height ) { crop.height = webcam_height - crop.top; } else { crop.height = rect.height + pad * 2};
         
-        context.drawImage(imageObj, crop.left, crop.top, crop.width, crop.height, 0, 0, 360, 360);
+        context.drawImage(imageObj, crop.left, crop.top, crop.width, crop.height, 0, 0, 640, 640);
 
 
         if (seen_face < 36) { seen_face++; }
@@ -143,9 +161,15 @@ function analyze_face(data) {
 
 // Print love letters to get burned.
 function print_snapshot() {
-    var win=window.open();
-    win.document.write("<br><img src='"+canvas.toDataURL()+"'/>");
-    win.print();
-    win.location.reload();
+    // Temporarily clear the page out to lay it out nicely...
+    $('#my_camera, #my_result, #camera_controls').hide();
+    
+    // Insert a quote on overcoming loss of this temporary face.
+
+
+    // Go print it out!  Use Firefox Seamless Printing to bypass print dialog.
+    window.print();
+
+    $('#my_camera, #my_result, #camera_controls').show();
 }
 

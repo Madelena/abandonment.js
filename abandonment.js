@@ -8,8 +8,6 @@
 
 
 // Initialize.
-// Attach webcam.js to div.
-Webcam.attach( '#my_camera' );
 
 // Set parameters for Microsoft Face API.
 var params = {
@@ -18,6 +16,20 @@ var params = {
     "returnFaceAttributes": "age,gender",
 };
 var API_KEY = "be17f91bf8494c03af5135474407f40f";
+
+
+// Attach webcam.js to div.
+Webcam.attach( '#my_camera' );
+
+
+// Set webcam size.
+var webcam_width = 640;
+var webcam_height = 360;
+
+Webcam.set({
+    width: webcam_width,
+    height: webcam_height
+});
 
 // Some very elementary AI parameters.
 var seen_face = 0;
@@ -55,9 +67,7 @@ function dataURItoBlob(dataURI) {
 function take_snapshot() {
     Webcam.snap( function(data_uri) {
 
-        document.getElementById('my_result').innerHTML = '<img src="'+data_uri+'"/>';
-
-        var raw_image_data = data_uri.replace(/^data\:image\/\w+\;base64\,/, '');
+        document.getElementById('my_result').innerHTML = '<img id="my_snapshot" src="'+data_uri+'"/>';
 
         $.ajax({
             url: "https://api.projectoxford.ai/face/v1.0/detect?" + $.param(params),
@@ -75,6 +85,7 @@ function take_snapshot() {
             processData: false,
         })
         .done(function(data) {
+            $('#face_info').html("Hello! ");
             analyze_face(data);
         })
         .fail(function(data) {
@@ -88,10 +99,30 @@ function take_snapshot() {
 
 // Let's see what we've got from Microsoft...
 function analyze_face(data) {
+
+    // If there are faces detected...
     if (data.length > 0) {
         $('#face_info').append('Wow! Hello there!');
         console.log(data);
         $('#face_info').append(data[0].faceAttributes.age);
+
+        // Crop image to your face.
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+
+        var imageObj = new Image();
+        imageObj.src = document.getElementById('my_snapshot').src;
+
+        var rect = data[0].faceRectangle;
+        var pad = 100;
+        var crop = { left: 0, top: 0, width: 0, height: 0 };
+        if ( rect.left < pad ) { crop.left = 0; } else { crop.left = rect.left - pad};
+        if ( rect.top < pad ) { crop.top = 0; } else { crop.top = rect.top - pad};
+        if ( rect.left + rect.width + pad > webcam_width ) { crop.width = webcam_width - crop.left; } else { crop.width = rect.width + pad * 2};
+        if ( rect.top + rect.height + pad > webcam_height ) { crop.height = webcam_height - crop.top; } else { crop.height = rect.height + pad * 2};
+        
+        context.drawImage(imageObj, crop.left, crop.top, crop.width, crop.height, 0, 0, 360, 360);
+
 
         seen_face++;
 
@@ -99,7 +130,9 @@ function analyze_face(data) {
 
         // Is the same person 5 seconds ago still here?
     } else {
-        $('#face_info').append("I can't see anyone. So lonely here. :(");
+    
+    // If there are no faces detected...
+        $('#face_info').html("I can't see anyone. So lonely here. :(");
 
         seen_noface++;
     }

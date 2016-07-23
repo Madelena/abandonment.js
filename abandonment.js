@@ -44,27 +44,6 @@ Webcam.on( 'live', function() {
 } );
 
 
-// Essential for sending octet-stream to Face API. Thanks Stoive!!
-function dataURItoBlob(dataURI) {
-    // convert base64/URLEncoded data component to raw binary data held in a string
-    var byteString;
-    if (dataURI.split(',')[0].indexOf('base64') >= 0)
-        byteString = atob(dataURI.split(',')[1]);
-    else
-        byteString = unescape(dataURI.split(',')[1]);
-
-    // separate out the mime component
-    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-    // write the bytes of the string to a typed array
-    var ia = new Uint8Array(byteString.length);
-    for (var i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-    }
-
-    return new Blob([ia], {type:mimeString});
-}
-
 
 // Take a snapshot from live webcam.
 function take_snapshot() {
@@ -132,7 +111,7 @@ function analyze_face(data) {
         context.drawImage(imageObj, crop.left, crop.top, crop.width, crop.height, 0, 0, 360, 360);
 
 
-        seen_face++;
+        if (seen_face < 36) { seen_face++; }
         if (seen_noface > 0) { seen_noface--; }
         feel_despair = false;
 
@@ -143,7 +122,7 @@ function analyze_face(data) {
             $('#face_info').html("I can't see anyone. So lonely here. :( " + seen_face + "/" + seen_noface);
         };
 
-        seen_noface++;
+        if (seen_noface < 36) { seen_noface++; }
         if (seen_face > 0) { seen_face--; }
 
         // If there had been no faces for the past 12 checks (i.e. 5 * 10 = 1 minute),
@@ -154,10 +133,19 @@ function analyze_face(data) {
             seen_noface = 0;
 
             // Now go write your love letters.
+            print_snapshot();
         }
 
 
     }
 }
 
+
+// Print love letters to get burned.
+function print_snapshot() {
+    var win=window.open();
+    win.document.write("<br><img src='"+canvas.toDataURL()+"'/>");
+    win.print();
+    win.location.reload();
+}
 

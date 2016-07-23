@@ -24,7 +24,7 @@ Webcam.attach( '#my_camera' );
 
 // Set webcam size.
 var webcam_width = 640;
-var webcam_height = 360;
+var webcam_height = 480;
 
 Webcam.set({
     width: webcam_width,

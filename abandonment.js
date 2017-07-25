@@ -35,20 +35,20 @@ Webcam.set({
 var seen_face = 0;
 var seen_noface = 0;
 var feel_despair = false;
-
+$('#my_camera, #my_result, #camera_controls').hide();
 
 // Some computer-affirming quotes.
 var life_quote = [
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    ''
+    'Dear Stranger, When will I see you again?',
+    'Hello there, I miss you and I will be fine.',
+    'Dear Dear, it was great when we met.',
+    'Dear Stranger, We will meet again someday.',
+    'If our paths will never cross again, I wish the very best of you.',
+    'Hello there, my friend. It was great while it lasted.',
+    'Hello friend, have a great journey.',
+    'Dear Stranger, I may forget you, but our moment is forever.',
+    'Hello there, my friend. It was an honor to meet you.',
+    'True love waits.'
     ];
 
 
@@ -83,7 +83,7 @@ function take_snapshot() {
             processData: false,
         })
         .done(function(data) {
-            $('#face_info').html("Hello! ");
+            // $('#face_info').html("Hello! ");
             analyze_face(data);
         })
         .fail(function(data) {
@@ -107,9 +107,9 @@ function analyze_face(data) {
 
     // If there are faces detected...
     if (data.length > 0) {
-        $('#face_info').append('Wow! Hello there! ' + seen_face + "/" + seen_noface);
+        $('#face_info').html('Wow! Hello there! :) <small>happiness: ' + seen_face + "/ loneliness:" + seen_noface);
         console.log(data);
-        $('#face_info').append(data[0].faceAttributes.age);
+        // $('#face_info').append(data[0].faceAttributes.age);
 
         // Crop image to your face.
         var canvas = document.getElementById('myCanvas');
@@ -137,7 +137,7 @@ function analyze_face(data) {
     
         // If there are no faces detected...
         if (!feel_despair) {
-            $('#face_info').html("I can't see anyone. So lonely here. :( " + seen_face + "/" + seen_noface);
+            $('#face_info').html("I can't see anyone. :( <small>happiness: " + seen_face + "/ loneliness:" + seen_noface);
         };
 
         if (seen_noface < 36) { seen_noface++; }
@@ -165,11 +165,13 @@ function print_snapshot() {
     $('#my_camera, #my_result, #camera_controls').hide();
     
     // Insert a quote on overcoming loss of this temporary face.
-
+    var rand = Math.round( Math.random() * life_quote.length) - 1;
+    $('#face_info').html(life_quote[rand]);
 
     // Go print it out!  Use Firefox Seamless Printing to bypass print dialog.
     window.print();
+    seen_noface = 0;
 
-    $('#my_camera, #my_result, #camera_controls').show();
+    // $('#my_camera, #my_result, #camera_controls').show();
 }
 
